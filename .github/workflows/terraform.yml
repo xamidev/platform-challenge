@@ -1,0 +1,44 @@
+name: Terraform CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform.yml'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform.yml'
+
+jobs:
+  terraform-validation:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./terraform
+
+    steps:
+      # 1. Récupération du code source
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Installation de Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5.0"
+
+      # 3. Vérification du formatage du code Terraform
+      - name: Terraform Format Check
+        run: terraform fmt -check
+
+      # 4. Initialisation de Terraform
+      - name: Terraform Init
+        run: terraform init
+
+      # 5. Validation de la syntaxe et de la configuration
+      - name: Terraform Validate
+        run: terraform validate
